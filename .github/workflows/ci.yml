@@ -1,0 +1,70 @@
+name: BankAI CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+            worker/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Build backend
+        working-directory: backend
+        run: npm run build
+
+      - name: Install worker dependencies
+        working-directory: worker
+        run: npm ci
+
+      - name: Build worker
+        working-directory: worker
+        run: npm run build
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:5000
+        run: npm run build
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: Helm lint
+        run: helm lint ./infrastructure/helm/bankai
+
+      - name: Build backend Docker image
+        run: docker build -t bankai-backend:ci -f backend/Dockerfile .
+
+      - name: Build worker Docker image
+        run: docker build -t bankai-worker:ci -f worker/Dockerfile .
+
+      - name: Build frontend Docker image
+        run: docker build -t bankai-frontend:ci -f frontend/Dockerfile .
