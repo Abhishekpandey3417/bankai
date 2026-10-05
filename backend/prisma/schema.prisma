@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  passwordHash String
+  role         UserRole      @default(CUSTOMER)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  accounts     Account[]
+  cards        Card[]
+  transactions Transaction[]
+  notifications Notification[]
+}
+
+model Account {
+  id            String        @id @default(cuid())
+  accountNumber String        @unique
+  type          AccountType
+  balance       Decimal       @db.Decimal(15, 2)
+  currency      String        @default("INR")
+  userId        String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  amount      Decimal         @db.Decimal(15, 2)
+  type        TransactionType
+  description String
+  category    String?
+  accountId   String
+  userId      String
+  createdAt   DateTime        @default(now())
+  account     Account         @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Card {
+  id          String   @id @default(cuid())
+  lastFour    String
+  cardType    String
+  expiryMonth Int
+  expiryYear  Int
+  isActive    Boolean  @default(true)
+  userId      String
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  type      String
+  isRead    Boolean  @default(false)
+  userId    String
+  createdAt DateTime @default(now())
+  
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model KnowledgeChunk {
+  id        String   @id @default(cuid())
+  content   String
+  source    String
+  embedding Json
+  createdAt DateTime @default(now())
+
+  @@index([source])
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum AccountType {
+  SAVINGS
+  CURRENT
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+}

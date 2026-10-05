@@ -1,0 +1,58 @@
+namespace: bankai
+
+images:
+  backend:
+    repository: bankai-backend
+    tag: latest
+    pullPolicy: Never
+
+  frontend:
+    repository: bankai-frontend
+    tag: latest
+    pullPolicy: Never
+
+  worker:
+    repository: bankai-worker
+    tag: latest
+    pullPolicy: Never
+
+  postgres:
+    repository: postgres
+    tag: "17"
+    pullPolicy: IfNotPresent
+
+  redis:
+    repository: redis
+    tag: "7"
+    pullPolicy: IfNotPresent
+
+backend:
+  replicas: 1
+  port: 5000
+
+frontend:
+  replicas: 1
+  port: 3000
+  nodePort: 30080
+
+worker:
+  replicas: 1
+
+postgres:
+  port: 5432
+  database: bankai
+  storage: 1Gi
+
+redis:
+  port: 6379
+
+config:
+  nodeEnv: production
+  frontendUrl: http://localhost:3000
+  nextPublicApiUrl: http://localhost:5000
+
+existingSecret:
+  enabled: true
+  name: bankai-secrets
+
+createNamespace: false

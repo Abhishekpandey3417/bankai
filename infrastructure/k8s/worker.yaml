@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: bankai
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: worker
+
+  template:
+    metadata:
+      labels:
+        app: worker
+
+    spec:
+      containers:
+        - name: worker
+          image: bankai-worker:latest
+          imagePullPolicy: Never
+
+          env:
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: bankai-config
+                  key: NODE_ENV
+
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: bankai-config
+                  key: DATABASE_URL
+
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: bankai-config
+                  key: REDIS_URL

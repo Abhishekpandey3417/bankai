@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+
+node_modules/
+dist/
+.next/
+infrastructure/k8s/secret.yaml
+infrastructure/helm/bankai/secret-values.yaml
+
+helm-rendered.yaml
