@@ -1,10 +1,10 @@
-namespace: bankai
+namespace: bankai-helm
 
 images:
   backend:
     repository: bankai-backend
     tag: latest
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
 
   frontend:
     repository: bankai-frontend
@@ -12,9 +12,9 @@ images:
     pullPolicy: Never
 
   worker:
-    repository: bankai-worker
+    repository: busybox
     tag: latest
-    pullPolicy: Never
+    pullPolicy: Always
 
   postgres:
     repository: postgres
@@ -49,6 +49,7 @@ redis:
 config:
   nodeEnv: production
   frontendUrl: http://localhost:3000
+  databaseUrl: "postgresql://postgres:postgres@postgres:5432/bankai"
   nextPublicApiUrl: http://localhost:5000
 
 existingSecret:

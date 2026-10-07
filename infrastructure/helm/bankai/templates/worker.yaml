@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: worker
   namespace: {{ .Values.namespace }}
+
 spec:
   replicas: {{ .Values.worker.replicas }}
 
@@ -21,6 +22,14 @@ spec:
           image: "{{ .Values.images.worker.repository }}:{{ .Values.images.worker.tag }}"
           imagePullPolicy: {{ .Values.images.worker.pullPolicy }}
 
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+
           env:
             - name: NODE_ENV
               valueFrom:
@@ -30,8 +39,8 @@ spec:
 
             - name: DATABASE_URL
               valueFrom:
-                configMapKeyRef:
-                  name: bankai-config
+                secretKeyRef:
+                  name: {{ .Values.existingSecret.name }}
                   key: DATABASE_URL
 
             - name: REDIS_URL

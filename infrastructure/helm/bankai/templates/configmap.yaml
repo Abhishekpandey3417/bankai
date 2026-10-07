@@ -8,4 +8,5 @@ data:
   PORT: {{ .Values.backend.port | quote }}
   FRONTEND_URL: {{ .Values.config.frontendUrl | quote }}
   REDIS_URL: "redis://redis:6379"
+  DATABASE_URL: {{ .Values.config.databaseUrl | quote }}
   NEXT_PUBLIC_API_URL: {{ .Values.config.nextPublicApiUrl | quote }}
