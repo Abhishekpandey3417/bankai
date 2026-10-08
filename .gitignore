@@ -5,10 +5,13 @@
 node_modules/
 dist/
 .next/
+
 infrastructure/k8s/secret.yaml
 infrastructure/helm/bankai/secret-values.yaml
 
 helm-rendered.yaml
+*-helm-rendered.yaml
+
 # Docker image archives
 *.tar
 *.tar.gz
